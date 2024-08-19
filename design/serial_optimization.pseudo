@@ -1,0 +1,29 @@
+declare structure zip_password
+  file_path
+  zip_file
+  password
+  password_found
+  password_found_mutex
+  password_info
+  next_password
+end declaration
+
+procedure find_password(first_zip)
+  for each zip
+    zip_file = zip_open(zip)
+  end for
+  for each size
+    for each combination
+      transform_number_base
+      transform_number_to_pass
+      for each zip
+        zip_try_pass(zip_arr[i], pass)
+      end for
+
+end procedure
+
+procedure zip_try_pass(zip, pass)
+  if zip_open(zip, pass)
+    return 1;
+  end if
+end procedure

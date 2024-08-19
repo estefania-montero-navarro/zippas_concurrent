@@ -1,0 +1,195 @@
+declare structure pass_thread_data
+  current_size
+  comb_ini
+  comb_end
+  password_queue
+end declaration
+
+declare structure check_thread_data
+  passwords_queue
+  passwords_found
+  file_paths_array
+
+procedure get_thread_amount(argc, argv[])
+  if (argc > 1)
+    thread_amount = pass_to_int(argv[1])
+  else
+    thread_amount = max_thread_amount
+  end if
+end procedure
+
+procedure find_password(zip_password) //MOD
+    create_queue
+    pass_thread_data = create_pass_data(thread_amount, zip_password, queue)
+    check_thread_data = create_check_data(thread_amount, first_zip, queue)
+    if (!temp_data)
+      thread_amount = alphabet_size
+      temp_data = create_temp_data(thread_amount, zip_password)
+    end if
+    run_threads(thread_amount, pass_thread_data, check_thread_data);//ACA
+    erase_temp_data(temp_data, thread_amount)
+end procedure
+
+procedure create_pass_data(data_amount, pass_info, queue) //MOD
+  create_pass_data_arr
+    for (i=0...data_amount)
+      temp_pass_arr[i]:password_queue = password_queue
+    end for
+  return temp_data_arr
+end procedure
+
+procedure create_check_data(data_amount, first_zip, queue)
+  temp_data_arr = create temp_data_dynamic_array // Check de alloc
+  for (i=0...data_amount)
+  temp_file_path = "temp_dest/"+i
+  current_file = create_temp_file(zip_password:file_path,temp_file_pat)
+    temp_data_arr[i]:
+      temp_file_path = current_file
+      queue = queue
+      zip_password = zip_password
+  end for
+  return temp_data_arr
+end procedure
+
+// procedure generate_file_copies(first_zip,i)
+//   create_file_path_arr
+//   current = first_zip
+//   file_no = 0
+//   while(current != null)
+//     file_path_arr[file_no] = "temp"+i+file_no
+//     create_temp_file(file_path_arr[file_no], current:filepath)
+//     current = next_zip
+//     file_no++
+//   end  while
+//   return file_path_arr
+// end procedure
+
+procedure create_temp_file(file_path,source_file)
+  open(source_file)
+  create(dest_file)
+  file_size = get_file_size(source_file)
+  buf = dynamic_buffer(file_size)
+  read_file(source_file, buf)
+  write_file(buf, dest_file)
+  delete buf
+  close(dest_file)
+  close(source_file)
+  // Ckeck de alloc
+end procedure
+
+procedure run_threads(team_size, pass_thread_data, check_thread_data) // MOD
+  checker_threads = thread_dynamic_array(team_size/3)
+  password_threads = thread_dynamic_array(team_size-team_size/3)
+  
+  for size := 1 ... max_size
+    len_elev = len_elev(alphabet_count,size)
+    distribute_combinations(temp_data, len_elev)
+    for (i = 0...pass_t_size)
+      password_threads[create_thread(look_for_password, pass_thread_data[i]]
+    end for
+    for (i = 0...check_t_size)
+      check_threads[create_thread(check_passwords, check_thread_data[i]]
+    end for
+    for (i = 0...pass_t_size)
+      join_thread(password_threads[i])
+    end for
+    for (i = 0...check_t_size)
+      join_thread(check_threads[i])
+    end for
+
+  end for
+ 
+end procedure
+
+procedure distribute_combinations(temp_data, total_combos, size)
+  distribution = thread_amount / total_combos
+  rest = thread_amount % total_combos
+  comb_ini = 0
+  for (i=0 to thread_amount)
+    temp_data[i]:
+    current_size = size
+    comb_ini = comb_ini
+    comb_end = comb_ini + distribution
+    if (i < rest) {
+      ++comb_end
+    }
+    comb_ini = comb_end
+  end for
+end procedure
+
+procedure look_for_password(temp_data)// MOD
+    for combination = comb_ini to comb_end 
+      if (get_passwords_found < temp_data:zip_amount)
+      num_array[size]
+      transform_number_base(combination,size,alphabet_count,num_array)
+      password = transform_number_to_pass(alphabet,num_array,size)
+      enqueue(password)
+      // if (try_password(file,num_array))
+      //   size = max_pass_length
+      //   combination = len_elev
+      //   file = open_zip()
+      //   for size := 1 hasta max_pass_length
+      //     len_elev = len_elev(alphabet_count,size)
+      //     for combination = 0 hasta len_elev
+      //       num_array[size]
+      //       transform_number_base(combination,size,alphabet_count,num_array)
+      //       password = transform_number_to_pass(alphabet,num_array,size)
+      //       if (try_password(file,num_array)) {
+      //         size = max_pass_length
+      //         combination = len_elev
+      //         lock(password_found_mutex)
+      //         password_found = 1
+      //         lock(password_mutex)
+      //           zip_password = password
+      //         unlock(password_mutex)
+      //         unlock(password_found_mutex)
+      //       }
+      //     end for
+      //   end for
+      // end if
+      else
+        enqueue("")
+        combination = comb_end
+      end  if
+    end for
+end procedure
+
+procedure password_checker(password_queue, first_zip) { // NEW
+  for each zip
+    zip_file = zip_open(zip)
+  end for
+  while(true)
+    password = deque()
+    if (password == "")
+      zip_close(zip)
+      break
+    else
+      if (try_password(file,num_array)) {
+        size = max_pass_length
+        combination = len_elev
+        lock(password_found_mutex)
+        password_found = 1
+        lock(password_mutex)
+          zip_password = password
+        unlock(password_mutex)
+        unlock(password_found_mutex)
+      }
+}
+
+procedure get_passwords_found() // MOD
+  lock(password_found_mutex)
+    found = passwords_found
+  unlock(password_found_mutex)
+  return found
+end procedure
+
+procedure increment_password_found // NEW
+  lock(password_found_mutex)
+    ++passwords_found
+  unlock(password_found_mutex)
+end procedure
+
+procedure erase_temp_data(pass_thread_data, check_thread_data) //MOD
+  delete temp_data:password_queue
+    delete temp_data
+end procedure

@@ -1,0 +1,88 @@
+//REVISAR
+zip_source_begin_write_cloning
+zip_source_file
+zip_source_zip
+
+declare structure password_information
+  max_pass_length
+  pass_alphabet
+  pass_counter
+  alphabet_size
+  thread_amount
+end declaration
+
+declare structure zip_password
+  file_path
+  password
+  password_found
+  password_found_mutex
+  password_info
+  next_password
+end declaration
+
+declare structure temp_data
+  current_size
+  comb_ini
+  comb_end
+  temp_file_path
+  zip_password
+end declaration
+
+procedure main(argc,argv[])
+  get_thread_amount(argc,argv)
+  create password_information
+  zip_password first_zip
+  read_input(password_information,first_zip)
+  current := first_zip
+  while current exists
+    find_password(current)
+    current := next_after_current
+  end while
+  print_results(zip_array,password_information->pass_counter)
+  delete password_info
+  delete zip_array
+end procedure
+
+procedure read_input(pass_info,pass_array)
+  pass_info->pass_alphabet := read_line() //check
+  pass_info->max_pass_length := read_line() //check
+  read_line()
+  while end_of_file not reached:
+    //check
+    create zip_password := pass
+    pass->file_path := read_line()
+    pass->password_info := pass_info
+    ++pass_info->pass_counter 
+  end while
+end procedure
+
+procedure print_results(first_zip)
+  current = first_zip
+  while current exists
+    print(pass_array[i]->file_path+" "+pass_array[i]->password"\n")
+    current = next_zip
+  end while
+end procedure
+
+procedure len_elev(alphabet_count,size)
+  num_elev = alphabet_count
+  for i = 1 hasta size
+    num_elev = num_elev * alphabet_count
+  end for
+end for
+
+procedure transform_number_base(number,digit_amount,new_base,num_array)
+  --digit_amount
+  do
+    num_array[digit_amount] = (number)mod(new_base)
+    number = number/new_base
+    --digit_amount
+  while number > 0
+end procedure 
+
+procedure transform_number_to_pass(alphabet,num_array,array_size)
+  for i=0 to array_size
+    password = password + num_array[i]
+  end for
+  return password
+end procedure
